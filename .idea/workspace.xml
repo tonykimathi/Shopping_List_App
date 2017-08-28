@@ -2,11 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9eaab395-00ef-458d-b865-3aa4ae5bccbf" name="Default" comment="[CHORE]">
-      <change type="DELETED" beforePath="C:\Users\JANE\Desktop\Shopping_List_App\Designs\Wireframes.bmpr" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\JANE\Desktop\Shopping_List_App\Sign Up.html" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\JANE\Desktop\Shopping_List_App\dashboard.html" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\JANE\Desktop\Shopping_List_App\index.html" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\JANE\Desktop\Shopping_List_App\shopping_list.css" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\JANE\Desktop\Shopping_List_App\Designs\Shopping List UML.pdf" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\JANE\Desktop\Shopping_List_App\Designs\Sign Up.html" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\JANE\Desktop\Shopping_List_App\Designs\Wiring diagrams.bmpr" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\JANE\Desktop\Shopping_List_App\Designs\dashboard.html" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\JANE\Desktop\Shopping_List_App\Designs\index.html" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\JANE\Desktop\Shopping_List_App\Designs\shopping_list.css" afterPath="" />
     </list>
     <ignored path="Shopping_List_App.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -30,28 +31,7 @@
     <favorites_list name="Shopping_List_App" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="dashboard.html" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Designs/dashboard.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.87628865" vertical-offset="102" max-vertical-offset="714">
-              <caret line="36" column="7" selection-start-line="36" selection-start-column="7" selection-end-line="36" selection-end-column="7" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Designs/index.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-19.0" vertical-offset="305" max-vertical-offset="969">
-              <caret line="47" column="0" selection-start-line="47" selection-start-column="0" selection-end-line="49" selection-end-column="9" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf />
   </component>
   <component name="Git.Settings">
     <option name="PREVIOUS_COMMIT_AUTHORS">
@@ -357,11 +337,11 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="7" />
-    <editor active="true" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24963397" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24963397" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32861635" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32861635" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
@@ -406,23 +386,5 @@
   <component name="XDebuggerManager">
     <breakpoint-manager />
     <watches-manager />
-  </component>
-  <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Designs/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-19.0" vertical-offset="305" max-vertical-offset="969">
-          <caret line="47" column="0" selection-start-line="47" selection-start-column="0" selection-end-line="49" selection-end-column="9" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Designs/dashboard.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.87628865" vertical-offset="102" max-vertical-offset="714">
-          <caret line="36" column="7" selection-start-line="36" selection-start-column="7" selection-end-line="36" selection-end-column="7" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
   </component>
 </project>
