@@ -1,7 +1,5 @@
 language: python
 python:
  - "3.6"
-install:
- - pip install Shopping_List_App/requirements.txt
 script:
  - unittest
