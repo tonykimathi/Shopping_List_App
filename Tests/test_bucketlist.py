@@ -8,7 +8,7 @@ class ShoppingListTest(unittest.TestCase):
         self.shoppingList = ShoppingList(budget_amount)
 
 
-    def test_addItem_method_returns_error(self):
+    def test_addItem_method_returns_error_for_nonInt(self):
         self.assertRaises(ValueError, self.shoppingList.addItem, 1, "one", "thirty")
 
 
