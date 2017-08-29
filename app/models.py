@@ -1,58 +1,67 @@
+from werkzeug.security import generate_password_hash, check_password_hash
+
+
 class User(object):
-
-
     def __init__(self, name, email, password):
         self.name = name
         self.email = email
         self.__password = password
 
+@property
+def password():
+
+    raise AttributeError("password is not a readable attribute.")
+
+@password.setter
+def password(self, password):
+
+    self.password_hash = generate_password_hash(password)
 
 
+def verify_password(self, password):
+
+    return check_password_hash(self.password_hash, password)
 
 
-class ShoppingList():
+class ShoppingList(object):
 
-    shopping_list = []
+    cart = {}
+    balance = 0
+    budget_amount = 0
 
-    shopping_lists = []
-
-    def __init__(self, bucket_name, shopping_list_id):
-        self.bucket_name = bucket_name
-        self.shopping_list_id = shopping_list_id
-
-    def create_list(self, ):
+    def __init__(self, budget_amount):
+        self.budget_amount = budget_amount
 
 
-    def edit_list(self, ):
+    def addItem(self, item_name, price, quantity):
+
+        number_types = ( int, float, complex)
+
+        if isinstance(price, number_types) and isinstance(quantity, number_types) and isinstance(item_name, str):
+            self.cart[item_name] = price
+
+            total_cost = self.calculatePrice(price, quantity)
+
+            self.balance = self.budget_amount - total_cost
+        else:
+            raise ValueError
 
 
-    def view_list(self, ):
+    def removeItem(self, item_name):
+
+        if isinstance( item_name, str):
+            pass
+        else:
+            raise ValueError
 
 
-    def delete_list(self, ):
+    def calculatePrice(self, price, quantity):
 
+        total_amount = price * quantity
 
+        if total_amount > self.balance:
+            print("That amount is more than what we have")
+            return 0
 
-
-class Item(ShoppingList):
-
-
-    def __init__(self, item_name, item_id):
-        self.item_name = item_name
-        self.item_id = item_id
-
-
-    def add_item(self):
-        for self.item_name in shopping_list:
-            shopping_list.append(self.item_name)
-
-
-
-    def remove_item(self):
-        for self.item_name in shopping_list:
-            shopping_list.remove(self.item_name)
-
-
-    def view_items(self):
-        return shopping_list
+        return total_amount
 
