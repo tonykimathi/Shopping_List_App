@@ -1,7 +1,12 @@
 language: python
-python:
-  - "3.6.2"
+ - "3.6"
 
-install: "pip install -r requirements.txt
+script:
+ - tests/run_travis.sh
 
-script: unittest
+before_install:
+ - chmod +x tests/run_travis.sh
+
+
+install: pip install -r requirements.txt
+
