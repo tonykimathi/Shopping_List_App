@@ -24,4 +24,6 @@ This is an application that allows users  to record and share things they want t
    * $ (yourenvname) pip install -r requirements.txt
     
 ## Running the application
-    $  (yourenvname) python run.py
+   * $ export FLASK_CONFIG=development
+   * $ export FLASK_APP=run.py
+   * $ flask run
