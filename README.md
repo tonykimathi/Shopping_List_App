@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.org/tonykimathi/Shopping_List_App.svg?branch=Developer)](https://travis-ci.org/tonykimathi/Shopping_List_App)
-[![Test Coverage](https://codeclimate.com/tonykimathi/Shopping_List_App.svg)](https://codeclimate.com/tonykimathi/Shopping_List_App]
 [![GitHub issues](https://img.shields.io/github/issues/tonykimathi/Shopping_List_App.svg)](https://github.com/tonykimathi/Shopping_List_App/issues)
 
 # Shopping_List_App
