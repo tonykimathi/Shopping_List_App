@@ -30,7 +30,7 @@ This code has been tested using`unittest` and `nosetest`.
 $ nosetests --with-coverage --cover-package=Tests && coverage report
 
 # Samle output
-
+```
 ...........................
 Name                       Stmts   Miss  Cover   Missing
 --------------------------------------------------------
@@ -54,7 +54,7 @@ app\models.py                 73     56    23%
 config.py                      6      0   100%
 ----------------------------------------------
 TOTAL                        166     59    64%
-
+```
 
     
 ## Running the application
