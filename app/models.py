@@ -1,5 +1,4 @@
 import random
-from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class User(object):
@@ -12,17 +11,6 @@ class User(object):
         self.shopping_lists = []
         self.id = int(random.random()*500)
 
-    @property
-    def password(self):
-        raise AttributeError("password is not a readable attribute.")
-
-    @password.setter
-    def password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def verify_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
     def create_shopping_list(self, list_name):
 
         if list_name is None:
@@ -32,7 +20,7 @@ class User(object):
             return "Shopping list name must be a string"
 
         for shopping_list in self.shopping_lists:
-            if shopping_list.list_name == list_name:
+            if shopping_list.list_name in self.shopping_lists:
                 return "Shopping list already exists"
 
         added_list = ShoppingList(list_name)
@@ -78,10 +66,10 @@ class ShoppingList(object):
         if not isinstance(item_name, str):
             return "Wrong input. Please input a string"
 
-        added_item = Item(item_name)
-        self.list_items.append(added_item)
+        new_item = Item(item_name)
+        self.list_items.append(new_item)
 
-        return added_item.id
+        return new_item.id
 
     def delete_item(self, item_id):
 
@@ -91,8 +79,9 @@ class ShoppingList(object):
         for item in self.list_items:
             if item.id == item_id:
                 del item
+                return True
 
-        return "Item deleted"
+        return "Item does not exist"
 
     def update_shopping_list(self, added_list_name):
         if added_list_name is None:
@@ -105,15 +94,15 @@ class ShoppingList(object):
 
 
 class Item(object):
-    def __init__(self, item_name):
-        self.item_name = item_name
-        self.id = int(random.random()*500)
+    def __init__(self, name):
+        self.name = name
+        self.id = id
 
-    def update_list_items(self, item_name):
-        if item_name is None:
+    def update(self, name):
+        if name is None or len(name) < 1:
             return "Item must have a name"
 
-        if not isinstance(item_name, str):
+        if not isinstance(name, str):
             return "Item name must be a string"
 
-        self.item_name = item_name
+        self.name = name
