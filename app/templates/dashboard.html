@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+    <title>Dashboard</title>
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">Shopping List App</a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact Us</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="#"> Logout</a></li>
+        </ul>
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="row content">
+        <div class="col-sm-3">
+            <h2>View</h2>
+            <ul class="nav nav-pills nav-stacked">
+                <li class="active"><a href="#">My Shopping Lists</a></li>
+                <li><a href="#">Incomplete Shopping Lists</a></li>
+                <li><a href="#">Completed Shopping Lists</a></li>
+            </ul><br>
+        </div>
+        <div class="col-sm-5"><h1>My Shopping List</h1>
+            <input type="text" name="shopping item" id="shopping item" class="form-control" placeholder="+ Add shopping item" >
+            <button type="button" class="btn btn-default">Delete item</button>
+        </div>
+        <div class="col-sm-4"></div>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row content">
+        <div class="col-sm-3">
+
+        </div>
+        <div class="col-sm-5">
+            <div class="well">
+                <p>List 1.</p>
+                <button type="button" class="btn btn-default">Delete </button>
+                <button type="button" class="btn btn-default">Share</button>
+            </div>
+            <div class="well">
+                <p>List 2.</p>
+                <button type="button" class="btn btn-default">Delete </button>
+                <button type="button" class="btn btn-default">Share</button>
+            </div>
+            <div class="well">
+                <p>List 3.</p>
+                <button type="button" class="btn btn-default">Delete </button>
+                <button type="button" class="btn btn-default">Share</button>
+            </div>
+        </div>
+        <div class="col-sm-4">
+
+        </div>
+
+    </div>
+    <footer class="w3-container w3-padding-64 w3-center w3-black w3-xlarge">
+        <a href="#"><i class="fa fa-facebook-official"></i></a>
+
+        <a href="#"><i class="fa fa-twitter"></i></a>
+
+        <a href="#"><i class="fa fa-linkedin"></i></a>
+        <p class="w3-medium">
+            Powered by <a href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" target="_blank">bootstrap.css</a>
+        </p>
+    </footer>
+</div>
+</body>
+</html>
