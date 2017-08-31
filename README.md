@@ -1,6 +1,5 @@
 [![Build Status](https://travis-ci.org/tonykimathi/Shopping_List_App.svg?branch=Developer)](https://travis-ci.org/tonykimathi/Shopping_List_App)
 [![GitHub issues](https://img.shields.io/github/issues/tonykimathi/Shopping_List_App.svg)](https://github.com/tonykimathi/Shopping_List_App/issues)
-https://codeclimate.com/github/tonykimathi/Shopping_List_App
 
 # Shopping_List_App
 This is an application that allows users  to record and share things they want to spend money on meeting the needs of keeping track of their shopping lists.
@@ -32,7 +31,6 @@ $ nosetests --with-coverage --cover-package=Tests && coverage report
 
 # Samle output
 
-'''
 ...........................
 Name                       Stmts   Miss  Cover   Missing
 --------------------------------------------------------
@@ -57,7 +55,7 @@ config.py                      6      0   100%
 ----------------------------------------------
 TOTAL                        166     59    64%
 
-'''
+
     
 ## Running the application
    * $ export FLASK_CONFIG=development
