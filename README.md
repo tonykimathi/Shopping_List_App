@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/tonykimathi/Shopping_List_App.svg?branch=Developer)](https://travis-ci.org/tonykimathi/Shopping_List_App)
 [![GitHub issues](https://img.shields.io/github/issues/tonykimathi/Shopping_List_App.svg)](https://github.com/tonykimathi/Shopping_List_App/issues)
+[![Coverage Status](https://coveralls.io/repos/github/tonykimathi/Shopping_List_App/badge.svg?branch=master)](https://coveralls.io/github/tonykimathi/Shopping_List_App?branch=master)
 
 # Shopping_List_App
 This is an application that allows users  to record and share things they want to spend money on meeting the needs of keeping track of their shopping lists.
