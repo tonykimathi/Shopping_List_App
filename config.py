@@ -1,29 +1,4 @@
-class Config(object):
-    """
-    Common configurations
-    """
-
-    # Put any configurations here that are common across all environments
-
-
-class DevelopmentConfig(Config):
-    """
-    Development configurations
-    """
-
-    DEBUG = True
-
-
-
-class ProductionConfig(Config):
-    """
-    Production configurations
-    """
-
-    DEBUG = False
-    TESTING = True
-
-app_config = {
-    'development': DevelopmentConfig,
-    'production': ProductionConfig,
-}
+""" contains all flask configurations"""
+DEBUG = True
+SECRET_KEY = "This_is_a_very_complicated_secret_key_==>_x0eHx9ex855xc8x1c95"
+WTF_CSRF_SECRET_KEY = "This_is_a_very_complicated_secret_key_==>_x0eHx9ex855xc8x1c95"

@@ -10,17 +10,16 @@ class User(object):
         self.email = email
         self.first_name = first_name
         self.last_name = last_name
-        self.password_hash = password
+        self.password = password
         self.shopping_lists = []
         self.id = int(random.random()*500)
 
-
     @classmethod
-    def register(cls, username, email, password):
+    def register(cls, username, email, first_name, last_name, password):
 
         user = cls.user_exists(email)
         if user is False:
-            new_user = cls(username, email, password)
+            new_user = cls(username, email, first_name, last_name, password)
             new_user.save_to_users()
             return True
         else:
@@ -35,13 +34,13 @@ class User(object):
         return {
             'username': self.username,
             'email': self.email,
-            'password': self.password_hash,
+            'password': self.password,
             'id': self.id
         }
 
     @staticmethod
     def user_login_verify(email, password):
-        """ methods verifys user password and email"""
+        """ methods verifies user password and email"""
         user_exist = User.user_exists(email)
         if user_exist is True:
             emails_password = "".join([i['password']

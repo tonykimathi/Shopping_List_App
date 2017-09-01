@@ -1,29 +1,25 @@
-from app import create_app
 import unittest
-from flask_testing import TestCase
+from unittest import TestCase
+from app import app
 
 
-
-class TestBase(TestCase):
-    def create_app(self):
-        config_name = 'development'
-        app = create_app(config_name)
-
-        return app
-
-
-class TestViews(TestBase):
+class TestClass(TestCase):
+    """Main testing class for the flask app"""
+    def setUp(self):
+        """ method runs before each test"""
+        app.config['TESTING'] = True
+        self.client = app.test_client()
 
     def login(self, email, password):
         """ login helper """
-        return self.client.post('/login/',
+        return self.client.post('/login',
                                 data=dict(email=email,
                                           password=password),
                                 follow_redirects=True)
 
     def sign_up(self, username, email, password, confirm):
         """register helper """
-        return self.client.post('/Sign Up/',
+        return self.client.post('/Sign Up',
                                 data=dict(username=username,
                                           email=email,
                                           password=password,
@@ -32,7 +28,7 @@ class TestViews(TestBase):
 
     def logout(self):
         """logout helper   """
-        return self.client.get('/logout/',
+        return self.client.get('/logout',
                                follow_redirects=True)
 
     def test_sign_up(self):

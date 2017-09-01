@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash
 from app.forms import RegisterForm, LoginForm
 from app.models import User
 from functools import wraps
-from run import app
+from app import app
 
 
 def login_required(f):
@@ -15,6 +15,7 @@ def login_required(f):
             flash('You need to login first.')
             return redirect(url_for('login'))
     return wrap
+
 
 @app.route('/')
 @app.route('/index')
@@ -30,10 +31,13 @@ def sign_up():
     form = RegisterForm(request.form)
     if request.method == 'POST' and form.validate():
         username = form.username.data
+        first_name = form.username.data
+        last_name = form.username.data
+
         email = form.email.data
         password = generate_password_hash(form.password.data)
 
-        if User.register(username, email, password) is True:
+        if User.register(username, email, first_name, last_name, password) is True:
             user = User.current_user(email)
             session['logged_in'] = True
             session['username'] = username
@@ -52,10 +56,9 @@ def sign_up():
                            )
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login/', methods=['GET', 'POST'])
 def login():
     """ The user login method"""
-
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
         email = form.email.data
@@ -74,7 +77,13 @@ def login():
                 return redirect(url_for('dashboard'))
             else:
                 flash('Invalid Login!! Password or Email incorrect', 'error')
-                return redirect(url_for('index'))
+                return redirect(url_for('login_user'))
+        else:
+            flash("Email do not exist!!  first register")
+            return redirect(url_for('register_user'))
+    return render_template('login.html',
+                           form=form
+                           )
 
 
 @app.route('/dashboard')
