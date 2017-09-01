@@ -1,7 +1,10 @@
 import random
+from werkzeug.security import check_password_hash
 
 
 class User(object):
+    users = []
+
     def __init__(self, username, email, first_name, last_name, password):
         self.username = username
         self.email = email
@@ -10,6 +13,60 @@ class User(object):
         self.password_hash = password
         self.shopping_lists = []
         self.id = int(random.random()*500)
+
+
+    @classmethod
+    def register(cls, username, email, password):
+
+        user = cls.user_exists(email)
+        if user is False:
+            new_user = cls(username, email, password)
+            new_user.save_to_users()
+            return True
+        else:
+            return False
+
+    def save_to_users(self):
+
+        User.add_user(self.user_data())
+
+    def user_data(self):
+
+        return {
+            'username': self.username,
+            'email': self.email,
+            'password': self.password_hash,
+            'id': self.id
+        }
+
+    @staticmethod
+    def user_login_verify(email, password):
+        """ methods verifys user password and email"""
+        user_exist = User.user_exists(email)
+        if user_exist is True:
+            emails_password = "".join([i['password']
+                                       for i in User.users if email == i['email']])
+            return check_password_hash(emails_password, password)
+        return False
+
+    @staticmethod
+    def user_exists(email):
+
+        data = [i['email'] for i in User.users if email == i['email']]
+        return "".join(data) == email
+
+    @staticmethod
+    def add_user(arg):
+
+        if 'email' in arg:
+            User.users.append(arg)
+
+    @staticmethod
+    def current_user(email):
+
+        for user in User.users:
+            if email == user['email']:
+                return user
 
     def create_shopping_list(self, list_name):
 

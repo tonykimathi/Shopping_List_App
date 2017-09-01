@@ -14,14 +14,16 @@ class DevelopmentConfig(Config):
     DEBUG = True
 
 
+
 class ProductionConfig(Config):
     """
     Production configurations
     """
 
     DEBUG = False
+    TESTING = True
 
 app_config = {
     'development': DevelopmentConfig,
-    'production': ProductionConfig
+    'production': ProductionConfig,
 }

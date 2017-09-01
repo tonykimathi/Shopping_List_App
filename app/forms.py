@@ -1,4 +1,4 @@
-from wtforms import Form, StringField, TextAreaField, PasswordField, validators
+from wtforms import Form, StringField, PasswordField, validators
 
 
 class RegisterForm(Form):
@@ -10,10 +10,6 @@ class RegisterForm(Form):
     ])
     confirm = PasswordField('Confirm Password')
 
-
-class TextForm(Form):
-    title = StringField('Title', [validators.Length(min=5)])
-    body = TextAreaField('Body', [validators.Length(min=5)])
 
 class LoginForm(Form):
     email = StringField('Email', [validators.DataRequired(), validators.Email()])
