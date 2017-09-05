@@ -1,88 +1,84 @@
-import random
-from werkzeug.security import check_password_hash
+from flask_login import UserMixin
+import uuid
 
 
-class User(object):
+class User(UserMixin):
     users = []
 
-    def __init__(self, username, email, first_name, last_name, password):
+    def __init__(self, username, email, first_name, last_name, password, _userid=None):
         self.username = username
         self.email = email
         self.first_name = first_name
         self.last_name = last_name
         self.password = password
-        self.shopping_lists = []
-        self.id = int(random.random()*500)
+        self._id = uuid.uuid4().hex if _userid is None else _userid
 
     @classmethod
     def register(cls, username, email, first_name, last_name, password):
-
-        user = cls.user_exists(email)
-        if user is False:
-            new_user = cls(username, email, first_name, last_name, password)
-            new_user.save_to_users()
-            return True
-        else:
-            return False
-
-    def save_to_users(self):
-
-        User.add_user(self.user_data())
-
-    def user_data(self):
-
-        return {
-            'username': self.username,
-            'email': self.email,
-            'password': self.password,
-            'id': self.id
-        }
-
-    @staticmethod
-    def user_login_verify(email, password):
-        """ methods verifies user password and email"""
-        user_exist = User.user_exists(email)
-        if user_exist is True:
-            emails_password = "".join([i['password']
-                                       for i in User.users if email == i['email']])
-            return check_password_hash(emails_password, password)
-        return False
-
-    @staticmethod
-    def user_exists(email):
-
-        data = [i['email'] for i in User.users if email == i['email']]
-        return "".join(data) == email
-
-    @staticmethod
-    def add_user(arg):
-
-        if 'email' in arg:
-            User.users.append(arg)
-
-    @staticmethod
-    def current_user(email):
+        user_info = {}
 
         for user in User.users:
-            if email == user['email']:
-                return user
+            if username == user['username']:
+                return "Username already exists."
 
-    def create_shopping_list(self, list_name):
+            else:
+                user_info['username'] = username
+                user_info['email'] = email
+                user_info['first_name'] = first_name
+                user_info['last_name'] = last_name
+                user_info['password'] = password
+                User.users.append(user_info)
+
+                return "You have been registered successfully"
+
+    @classmethod
+    def login(cls, username, password):
+
+        for user in User.users:
+            if username == user['username']:
+                if password == user['password']:
+                    return "You have been logged in successfully"
+                else:
+                    return "Password is incorrect"
+            return "Please insert correct username"
+
+    @classmethod
+    def check_user(cls, email):
+        for user in User.users:
+            if email in User.users:
+                return user[email]
+
+
+class ShoppingList(object):
+
+    def __init__(self, list_name, owner, owner_id, content, _id=None):
+        self.list_name = list_name
+        self.owner = owner
+        self.owner_id = owner_id
+        self.content = content
+        self._id = uuid.uuid4().hex if _id is None else _id
+        self.shopping_lists = []
+
+    def create_shopping_list(self, list_name, content, owner, owner_id):
 
         if list_name is None:
             return "Please input an list name"
 
+        if content is None:
+            return "Please input a list item"
+
         if not isinstance(list_name, str):
             return "Shopping list name must be a string"
 
+        if not isinstance(content, str):
+            return "Content must be a string"
+
         for shopping_list in self.shopping_lists:
             if shopping_list.list_name in self.shopping_lists:
-                return "Shopping list already exists"
+                return "Shopping list name already exists"
 
-        added_list = ShoppingList(list_name)
+        added_list = ShoppingList(list_name, content, owner_id, owner)
         self.shopping_lists.append(added_list)
-
-        return added_list.id
 
     def delete_shopping_list(self, shopping_list_id):
 
@@ -95,8 +91,9 @@ class User(object):
 
         return "Shopping list deleted"
 
-    def view_shopping_lists(self):
-        shopping_list_names = []
+    def view_shopping_list(self):
+        shopping_list_names = [item for item in self.shopping_lists if item['owner'] == self.username]
+
         for shopping_list in self.shopping_lists:
             shopping_list_names.append(shopping_list.list_name)
 
@@ -105,10 +102,13 @@ class User(object):
 
 class ShoppingList(object):
 
-    def __init__(self, list_name):
+    def __init__(self, list_name, owner, owner_id, content, _id=None):
         self.list_name = list_name
+        self.owner = owner
+        self.owner_id = owner_id
+        self.content = content
+        self._id = uuid.uuid4().hex if _id is None else _id
         self.list_items = []
-        self.id = int(random.random()*500)
 
     def add_item(self, item_name):
 

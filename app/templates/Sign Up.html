@@ -1,58 +1,49 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
-    <title>Sign Up</title>
-</head>
-<body>
-<nav class="navbar navbar-default">
-    <div class="container-fluid">
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+Sign Up
+{% endblock %}
+
+{% block styles %}
+{{super()}}
+<link rel="stylesheet" href="{{url_for('.static', filename='shopping_list.css')}}">
+{% endblock %}
+
+{% block content %}
+{{super()}}
+<nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+    <div class="container topnav">
         <div class="navbar-header">
-            <a class="navbar-brand" href="#">Shopping List App</a>
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand topnav" href="{{ url_for('index') }}">Shopping List App</a>
         </div>
-        <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact Us</a></li>
-        </ul>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('sign_up') }}">Sign up</a></li>
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+            </ul>
+        </div>
     </div>
 </nav>
 <div class="container">
-    <form class="form-signup">
-        <fieldset>
-            <legend>Sign Up Form:</legend>
-            <div class="col-xs-8">
-                <label for="inputFirstName">FirstName</label>
-                <input type="text" name="inputFirstName" id="inputFirstName" class="form-control" placeholder="FirstName" >
-            </div>
-            <div class="col-xs-8">
-                <label for="inputLastName" >LastName</label>
-                <input type="text" name="inputLastName" id="inputLastName" class="form-control" placeholder="LastName" >
-            </div>
-            <div class="col-xs-8">
-                <label for="inputEmail" >Email address</label>
-                <input type="email" name="inputEmail" id="inputEmail" class="form-control" placeholder="Email address" >
-            </div>
-            <div class="col-xs-8">
-                <label for="inputPassword" >Password</label>
-                <input type="password" name="inputPassword" id="inputPassword" class="form-control" placeholder="Enter Password" >
-            </div>
-            <div class="col-xs-8">
-                <label for="confirmPassword" >Confirm Password</label>
-                <input type="password" name="inputPassword" id="confirmPassword" class="form-control" placeholder="Confirm Password" >
-            </div>
-            <div class="col-xs-8">
-                <a href="#"><button type="submit" class="btn btn-default">Submit</button></a>
-            </div>
-        </fieldset>
+
+    <form class="form-signin" method="POST" action="/sign_up">
+        <h2 class="form-signin-heading">Sign Up</h2>
+        {{ form.hidden_tag() }}
+        {{ wtf.form_field(form.username) }}
+        {{ wtf.form_field(form.first_name) }}
+        {{ wtf.form_field(form.last_name) }}
+        {{ wtf.form_field(form.email) }}
+        {{ wtf.form_field(form.password) }}
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign Up</button>
     </form>
 
-    <footer class="footer">
-        <p>Created by Tony Kimathi 2017</p>
-    </footer>
 </div>
-</body>
-</html>
+{% endblock %}

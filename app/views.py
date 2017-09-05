@@ -1,92 +1,75 @@
-from flask import render_template, session, redirect, url_for, flash, request
-from werkzeug.security import generate_password_hash
+from flask import render_template, redirect, url_for, flash
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 from app.forms import RegisterForm, LoginForm
 from app.models import User
-from functools import wraps
 from app import app
 
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_message = "You must be logged in to access this page."
+login_manager.login_view = "login"
 
-def login_required(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'logged_in' in session:
-            return f(*args, **kwargs)
-        else:
-            flash('You need to login first.')
-            return redirect(url_for('login'))
-    return wrap
+
+@login_manager.user_loader
+def load_user(email):
+
+    return User.check_user(email)
 
 
 @app.route('/')
 @app.route('/index')
-@login_required
 def index():
 
     return render_template('index.html')
 
 
-@app.route('/Sign Up', methods=['GET', 'POST'])
+@app.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
 
-    form = RegisterForm(request.form)
-    if request.method == 'POST' and form.validate():
+    form = RegisterForm()
+    if form.validate_on_submit():
         username = form.username.data
-        first_name = form.username.data
-        last_name = form.username.data
 
-        email = form.email.data
-        password = generate_password_hash(form.password.data)
+        password = generate_password_hash(form.password.data, method='sha256')
 
-        if User.register(username, email, first_name, last_name, password) is True:
-            user = User.current_user(email)
-            session['logged_in'] = True
-            session['username'] = username
-            session['email'] = email
-            session['password'] = password
-            session['id'] = user['_id']
-            flash('You have been registered!  {} '.format(username), 'success')
-            print(session['id'])
-            print(User.users)
-            return redirect(url_for('dashboard'))
-        else:
-            flash('Email exists!!! You can login instead!', 'error')
-            return redirect(url_for('login_user'))
+        new_user = User(username=form.username.data, first_name=form.first_name,
+                        last_name=form.last_name, email=form.email.data, password=password)
+
+        login_user(new_user, remember=form.remember.data)
+        flash('You have been registered!  {} '.format(username), 'successfully')
+        return redirect(url_for('dashboard'))
+
     return render_template('Sign Up.html',
                            form=form
                            )
 
 
-@app.route('/login/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     """ The user login method"""
-    form = LoginForm(request.form)
-    if request.method == 'POST' and form.validate():
-        email = form.email.data
-        password = form.password.data
+    form = LoginForm()
 
-        if User.user_exists(email) is True:
-            if User.user_login_verify(email, password) is True:
-                user = User.current_user(email)
-                session['logged_in'] = True
-                session['username'] = user['username']
-                session['email'] = email
-                session['password'] = user['password']
-                session['id'] = user['_id']
-                flash('You have successfully logged in!!', 'success')
-                print(session['id'])
+    if form.validate_on_submit():
+        user = User.check_user(form.email.data)
+        if user:
+            if check_password_hash(user.password, form.password.data):
+                login_user(user, remember=form.remember.data)
+                flash('You have been logged in successfully')
                 return redirect(url_for('dashboard'))
             else:
                 flash('Invalid Login!! Password or Email incorrect', 'error')
-                return redirect(url_for('login_user'))
+                return redirect(url_for('login'))
         else:
-            flash("Email do not exist!!  first register")
-            return redirect(url_for('register_user'))
+            flash("Email does not exist!! Register first")
+            return redirect(url_for('sign_up'))
     return render_template('login.html',
                            form=form
                            )
 
 
 @app.route('/dashboard')
+@login_required
 def dashboard():
 
     return render_template('dashboard.html')
@@ -95,6 +78,97 @@ def dashboard():
 @app.route('/logout')
 @login_required
 def logout():
-        session.pop('logged_in', None)
-        flash('You were logged out!')
-        return redirect(url_for('login'))
+    logout_user()
+    flash('You were logged out!')
+    return redirect(url_for('login'))
+
+@app.route('/create_shoppinglist', methods=['GET', 'POST'])
+@login_required
+def create_shoppinglist():
+    form = TextForm()
+    if current_user.is_authenticated:
+        if form.validate_on_submit():
+            title = form.title.data
+            body = form.body.data
+            current_user.create_shoppinglist(title, body)
+            flash(' You have created a shoppinglist', 'success')
+            return redirect(url_for('dashboard'))
+        return render_template('create.html',
+                           form=form)
+    return redirect(url_for('index'))
+
+
+@app.route('/create_item/<string:_id>/', methods=['GET', 'POST'])
+@login_required
+def create_item(_id):
+    form = TextForm()
+    if current_user.is_authenticated:
+        if form.validate_on_submit():
+            title = form.title.data
+            body = form.body.data
+            current_user.create_shoppinglist(title, body)
+            flash(' You have created a shoppinglist item', 'success')
+            return redirect(url_for('shoppinglist_items', _id=_id))
+        return render_template('add_item.html',
+                           form=form)
+    return redirect(url_for('index'))
+
+
+@app.route('/edit_shoppinglist/<string:_id>/', methods=['GET', 'POST'])
+@login_required
+def edit_shoppinglist(_id):
+    form = TextForm()
+    if current_user.is_authenticated:
+        if form.validate_on_submit():
+            title = form.title.data
+            body = form.body.data
+            current_user.edit_shoppinglist(title, body)
+            flash(' You have edited your shoppinglist', 'success')
+            return redirect(url_for('dashboard'))
+        return render_template('create.html', form=form)
+    return redirect(url_for('index'))
+
+
+@app.route('/edit_bucketlist_item/<string:_id>/', methods=['GET', 'POST'])
+@login_required
+def edit_shoppinglist_item(_id):
+    form = TextForm()
+    if current_user.is_authenticated:
+        if form.validate_on_submit():
+            title = form.title.data
+            body = form.body.data
+            current_user.edit_shoppinglist(title, body)
+            flash(' You have edited this shoppinglist item', 'success')
+            return redirect(url_for('dashboard'))
+        return render_template('create.html', form=form)
+    return redirect(url_for('index'))
+
+@app.route('/items/<string:_id>/')
+@app.route('/items/')
+@login_required
+def bucketlist_items(_id):
+
+
+    bucketlist_ = Data.get_the_data(_id, Data.bucketlists)
+    items = Data.get_the_data(_id, Data.items)
+    notify = 'You have no items in this bucketlist yet'
+    return render_template('items.html',
+                           items=items,
+                           notify=notify,
+                           bucketlist_=bucketlist_,
+                           title=page_title)
+
+@app.route('/delete/<string:_id>/')
+def delete_shoppinglist(_id):
+
+
+    flash('Shoppinglist deleted', 'Danger')
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/delete_item/<string:_id>/')
+def delete_item(_id):
+
+
+    flash('Item deleted', 'Danger')
+    return redirect(url_for('shoppinglist_items', _id=b_id))
