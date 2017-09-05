@@ -11,7 +11,7 @@ class User(UserMixin):
         self.first_name = first_name
         self.last_name = last_name
         self.password = password
-        self._id = uuid.uuid4().hex if _userid is None else _userid
+        self.id = uuid.uuid4().hex if _userid is None else _userid
 
     @classmethod
     def register(cls, username, email, first_name, last_name, password):

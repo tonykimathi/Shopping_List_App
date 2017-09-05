@@ -1,20 +1,24 @@
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, session, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.forms import RegisterForm, LoginForm
 from app.models import User
+from app.models import ShoppingList
 from app import app
 
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_message = "You must be logged in to access this page."
-login_manager.login_view = "login"
+users = []
+shoppinglists = []
+
+#login_manager = LoginManager()
+#login_manager.init_app(app)
+#login_manager.login_message = "You must be logged in to access this page."
+#login_manager.login_view = "login"
 
 
-@login_manager.user_loader
-def load_user(email):
+#@login_manager.user_loader
+#def load_user(email):
 
-    return User.check_user(email)
+ #   return User.check_user(email)
 
 
 @app.route('/')
@@ -26,17 +30,19 @@ def index():
 
 @app.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
-
+    error = None
     form = RegisterForm()
     if form.validate_on_submit():
-        username = form.username.data
+        for i in users:
+            if i.username == form.username.data
+                error = "Username already in use"
+
 
         password = generate_password_hash(form.password.data, method='sha256')
 
         new_user = User(username=form.username.data, first_name=form.first_name,
                         last_name=form.last_name, email=form.email.data, password=password)
 
-        login_user(new_user, remember=form.remember.data)
         flash('You have been registered!  {} '.format(username), 'successfully')
         return redirect(url_for('dashboard'))
 
@@ -49,6 +55,7 @@ def sign_up():
 def login():
     """ The user login method"""
     form = LoginForm()
+    error = None
 
     if form.validate_on_submit():
         user = User.check_user(form.email.data)
