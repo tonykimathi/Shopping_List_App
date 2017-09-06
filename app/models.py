@@ -1,4 +1,3 @@
-
 import uuid
 
 
@@ -53,6 +52,9 @@ class ShoppingList(object):
 
         ShoppingList.count += 1
 
+    def view_info(self):
+        return self.info
+
     def return_owner_name(self):
         return self.owner
 
@@ -76,21 +78,12 @@ class Item(object):
         }
         Item.count += 1
 
+    def view_info(self):
+        return self.info
 
-
-#    def add_item(self, item):
-#        self.item_content.append({"Id": self.count, "body": item})
-#        self.count += 1
-
-#    def update_item(self, item_id, item):
-#        for i in self.item_content:
-#            if str(i['Id']) == item_id:
- #               i['body'] = item
-
-#    def remove_item(self, item_id):
-#        for i in self.item_content:
-#            if str(i['Id']) == item_id:
- #               self.item_content.remove(i)
+    def update_name(self, new_title):
+        self.item_name = new_title
+        return new_title
 
 
 class Data ():
@@ -114,78 +107,55 @@ class Data ():
             if user['user_id'] == user_id:
                 return user
 
-    def create_shoppinglist(self):
+    def create_shoppinglist(self, user_id, name):
 
-        create_shopping_list = ShoppingList()
+        created_shopping_list = ShoppingList(name)
+        created_shopping_list_info = created_shopping_list.view_info()
+        user = self.get_user(user_id)
 
-
-    def add_shoppinglist(self, user_id, name):
-        """
-            Method to add shoppinglists to a user given the id of the
-            user
-        """
-        new_shoppinglist = ShoppingList(name)
-        new_shoppinglist_details = new_shoppinglist.get_details()
-        user = self.get_single_user(user_id)
-        new_shoppinglist_details['id'] = len(user['shopping_lists']) + 1
-        for item in user['shopping_lists']:
-            if item['name'] == name:
-                return "Shopping list " + str(name) + " exits. Try editing it"
-            if new_shoppinglist_details['id'] == item['id']:
-                new_shoppinglist_details['id'] = new_shoppinglist_details['id']
-                + 1
-        user['shopping_lists'].append(new_shoppinglist_details)
+        user['shopping_lists'].append(created_shopping_list_info)
         return "Shopping list " + str(name) + " Created"
 
-    def get_shoppinglist(self, user_id, item_id):
-        """
-            Method to return a single user item based on the user
-            item's id and its user's id
-        """
-        single_user = self.get_single_user(user_id)
-        for item in single_user['shopping_lists']:
+    def view_shoppinglist(self, user_id, item_id):
+        user = self.get_user(user_id)
+
+        for item in user['shopping_lists']:
             if item['id'] == item_id:
                 return item
 
-    def remove_shoppinglist(self, user_id, item_id):
-        """
-            Method to delete a user item based on its id and its
-            user's id
-        """
-        single_user = self.get_single_user(user_id)
-        for item in single_user['shopping_lists']:
-            if item['id'] == int(item_id):
-                single_user['shopping_lists'].remove(item)
+    def delete_shoppinglist(self, user_id, item_id):
+        user = self.get_user(user_id)
 
-    def add_shoppingitems(self, user_id, shoppinglist_id, name, quantity):
+        for item in user['shopping_lists']:
+            if item['id'] == item_id:
+                user['shopping_lists'].remove(item)
+
+    def create_shoppinglist_items(self, user_id, shoppinglist_id, item_name, quantity):
         """
             Method to add shopping items to a shopping list
         """
-        new_shoppingitem = ShoppingItem(name, quantity)
-        new_shoppingitem_details = new_shoppingitem.get_details()
-        user = self.get_single_user(user_id)
-        for shopinglist in user['shopping_lists']:
-            if shopinglist['id'] == int(shoppinglist_id):
-                curr_shopinglist = shopinglist
-                new_shoppingitem_details['id'] = len(curr_shopinglist['items']) + 1
-                for item in curr_shopinglist['items']:
-                    if item['name'] == name:
-                        return "Item " + str(name) + " exits. Try editing it"
-                    if new_shoppingitem_details['id'] == item['id']:
-                        new_shoppingitem_details['id'] = new_shoppingitem_details['id'] + 1
-                curr_shopinglist['items'].append(new_shoppingitem_details)
-                return str(name) + " has been added"
+        created_shopping_list_item = Item(item_name, quantity)
+        created_shopping_list_item_info = created_shopping_list_item.view_info()
+        user = self.get_user(user_id)
+        for shoppinglist in user['shopping_lists']:
+            if shoppinglist['id'] == int(shoppinglist_id):
+                current_shopinglist = shoppinglist
+                for item in current_shopinglist['items']:
+                    if item['name'] == item_name:
+                        return "This item name already exits. Try editing it"
+                current_shopinglist['items'].append(created_shopping_list_item_info)
+                return str(item_name) + " has been created"
 
     def get_shoppingitem(self, user_id, shoppinglist_id, item_id):
         """Method to get a single item from the shopping list"""
-        shoppinglist = self.get_shoppinglist(user_id, shoppinglist_id)
-        for item in shoppinglist['items']:
+        shopping_list = self.view_shoppinglist(user_id, shoppinglist_id)
+        for item in shopping_list['items']:
             if item['id'] == item_id:
                 return item
 
-    def remove_shoppingitem(self, user_id, shoppinglist_id, item_id):
+    def delete_shoppingitem(self, user_id, shoppinglist_id, item_id):
         """Method to delete an item from the shoppinglist"""
-        shoppinglist = self.get_shoppinglist(user_id, shoppinglist_id)
-        for item in shoppinglist['items']:
+        shopping_list = self.view_shoppinglist(user_id, shoppinglist_id)
+        for item in shopping_list['items']:
             if item['id'] == int(item_id):
-                shoppinglist['items'].remove(item)
+                shopping_list['items'].remove(item)
