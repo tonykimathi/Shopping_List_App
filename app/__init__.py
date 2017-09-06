@@ -1,11 +1,12 @@
 from flask import Flask
 from flask_bootstrap import Bootstrap
+from app.models import Data
 
 
 app = Flask(__name__)
 Bootstrap(app)
 
-
+data = Data()
 
 from app import views
 

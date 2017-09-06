@@ -1,10 +1,10 @@
 from flask import render_template, redirect, url_for, flash, session, request
 from functools import wraps
-from app.forms import RegisterForm, LoginForm
+from app.forms import RegisterForm, LoginForm, TextForm
 from app.models import User
 from app.models import ShoppingList
 from app.models import Item
-from app import app
+from app import app, data
 
 
 users = []
@@ -34,16 +34,10 @@ def sign_up():
     error = None
     form = RegisterForm()
     if form.validate_on_submit():
-        for i in users:
-            if i.username == form.username.data:
-                error = 'Username already exists'
-                return render_template('Sign Up.html', form=form, error=error)
-            new_user = User(form.username.data, form.email.data, form.password.data, form.first_name.data,
-                            form.last_name.data)
-            users.append(new_user)
-            session['username'] = new_user.username
-            flash("You have been registered successfully")
-            return redirect(url_for('dashboard'))
+        data.create_user(form.username.data, form.email.data, form.password.data,
+                         form.first_name.data, form.last_name.data)
+        flash("Account successfully created")
+        return redirect(url_for('dashboard'))
     return render_template('Sign Up.html', form=form, error=error)
 
 
@@ -70,15 +64,14 @@ def login():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    if 'username' in session:
-        if session['username'] not in shoppinglists:
-            shoppinglists[session['username']] = []
+    if session['logged_in']:
+        notify = 'You have no shopping lists yet'
         return render_template(
-            'dashboard.html',
-            data=shoppinglists[session['username']],
-            user=session['username'])
-    else:
-        return redirect(url_for('login'))
+            "dashboard.html",
+            notify=notify
+        )
+
+
 
 
 @app.route('/logout')
