@@ -1,4 +1,6 @@
 {% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
 
 {% block title %}
 Shopping List App
@@ -24,7 +26,7 @@ Shopping List App
           </div>
           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
               <ul class="nav navbar-nav navbar-right">
-                  <li><a href="{{ (url_for('index') }}">Home</a></li>
+                  <li><a href="index.html">Home</a></li>
                   <li><a href="Sign%20Up.html">Sign up</a></li>
                   <li><a href="login.html">Login</a></li>
               </ul>
@@ -53,7 +55,9 @@ Shopping List App
         <h1>Shopping List Dashboard</h1>
     </div>
     <div class="jumbotron">
-        {{ wtf.quick_form(form) }}
+        {{ form.csrf_token }}
+        {{ wtf.form_field(form.email) }}
+        {{ wtf.form_field(form.username) }}
     </div>
     {% if shoppinglists %}
         <div class="row">
@@ -67,9 +71,9 @@ Shopping List App
                         <tr>
                             <td>{{ shoppinglist['name'] }}</td>
                             <td class="edit-buttons">
-                                <button><a href="{{ url_for('dashboard.view_shoppinglist', id=shoppinglist['id']) }}">Add Items</a></button>
-                                <button class="edit"><a href="{{ url_for('dashboard.shoppinglist_edit', sh_id=shoppinglist['id']) }}">Edit</a></button>
-                                <button class="delete"><a href="{{ url_for('dashboard.delete_shoppinglist', sh_id=shoppinglist['id']) }}">Delete</a></button>
+                                <button><a href="#">Add Items</a></button>
+                                <button class="edit"><a href="#">Edit</a></button>
+                                <button class="delete"><a href="#">Delete</a></button>
                             </td>
                         </tr>
                     {% endfor %}
@@ -93,5 +97,4 @@ Shopping List App
             Powered by <a href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" target="_blank">bootstrap.css</a>
         </p>
     </footer>
-</div>
 {% endblock %}
