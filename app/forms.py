@@ -22,7 +22,7 @@ class RegisterForm(FlaskForm):
 
 class TextForm(FlaskForm):
     name = StringField('Title', validators=[Length(min=5)])
-    quantity = TextAreaField('Body', validators=[Length(min=5)])
+    content = TextAreaField('Body', validators=[Length(min=5)])
 
 
 
