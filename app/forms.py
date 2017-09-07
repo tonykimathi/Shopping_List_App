@@ -19,9 +19,10 @@ class RegisterForm(FlaskForm):
     remember = BooleanField('Remember me')
 
 
+
 class TextForm(FlaskForm):
-    title = StringField('Title', validators=[Length(min=5)])
-    body = TextAreaField('Body', validators=[Length(min=5)])
+    name = StringField('Title', validators=[Length(min=5)])
+    quantity = TextAreaField('Body', validators=[Length(min=5)])
 
 
 

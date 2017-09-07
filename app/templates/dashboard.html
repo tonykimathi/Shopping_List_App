@@ -48,33 +48,41 @@ Shopping List App
         <div class="col-sm-4"></div>
     </div>
 </div>
-<div class="container-fluid">
-    <div class="row content">
-        <div class="col-sm-3">
-
-        </div>
-        <div class="col-sm-5">
-            <div class="well">
-                <p>List 1.</p>
-                <button type="button" class="btn btn-default">Delete </button>
-                <button type="button" class="btn btn-default">Share</button>
-            </div>
-            <div class="well">
-                <p>List 2.</p>
-                <button type="button" class="btn btn-default">Delete </button>
-                <button type="button" class="btn btn-default">Share</button>
-            </div>
-            <div class="well">
-                <p>List 3.</p>
-                <button type="button" class="btn btn-default">Delete </button>
-                <button type="button" class="btn btn-default">Share</button>
-            </div>
-        </div>
-        <div class="col-sm-4">
-
-        </div>
-
+<div class="container">
+    <div class="dash-header">
+        <h1>Shopping List Dashboard</h1>
     </div>
+    <div class="jumbotron">
+        {{ wtf.quick_form(form) }}
+    </div>
+    {% if shoppinglists %}
+        <div class="row">
+            <div class="dash-table col-md-8">
+                <h1>My Shopping Lists</h1>
+                <table class="table">
+                    <tr>
+                        <th>Shopping List Name</th>
+                    </tr>
+                    {% for shoppinglist in shoppinglists %}
+                        <tr>
+                            <td>{{ shoppinglist['name'] }}</td>
+                            <td class="edit-buttons">
+                                <button><a href="{{ url_for('dashboard.view_shoppinglist', id=shoppinglist['id']) }}">Add Items</a></button>
+                                <button class="edit"><a href="{{ url_for('dashboard.shoppinglist_edit', sh_id=shoppinglist['id']) }}">Edit</a></button>
+                                <button class="delete"><a href="{{ url_for('dashboard.delete_shoppinglist', sh_id=shoppinglist['id']) }}">Delete</a></button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    {% else %}
+    <div class="dash-table">
+        <h1>Create new shopping lists</h1>
+    </div>
+    {% endif %}
+    {{ utils.flashed_messages() }}
+</div>
     <footer class="w3-container w3-padding-64 w3-center w3-black w3-xlarge">
         <a href="#"><i class="fa fa-facebook-official"></i></a>
 
