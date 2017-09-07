@@ -119,6 +119,7 @@ def create_item(_id):
 @app.route('/dashboard')
 @login_required
 def dashboard():
+    form = TextForm()
     title = "Dashboard"
     shopping_lists = Data.get_the_data(session['id'], Data.shoppinglists)
     notify = 'You have no shopping lists yet!'
@@ -126,6 +127,7 @@ def dashboard():
                            shopping_lists=shopping_lists,
                            notify=notify,
                            username=session['username'],
+                           form=form,
                            title=title)
 
 
