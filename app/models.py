@@ -51,17 +51,17 @@ class User(object):
             '_id': self._id
         }
 
-    def create_shoppinglist(self, title, intro):
-        shopping_list = ShoppingList(owner_id=self._id, title=title, intro=intro, owner=self.username)
+    def create_shoppinglist(self, title):
+        shopping_list = ShoppingList(owner_id=self._id, title=title, owner=self.username)
         shopping_list.save_to_shoppinglists()
 
     @staticmethod
-    def create_item(_id, item_name, description):
+    def create_item(_id, item_name, quantity):
 
         shoppinglist_data = Data.get_the_data(_id, Data.shoppinglists)
         for data in shoppinglist_data:
-            shoppinglist = ShoppingList(data['title'], data['owner'], data['intro'], data['owner_id'], data['_id'])
-            shoppinglist.new_item(item_name=item_name, description=description)
+            shoppinglist = ShoppingList(data['title'], data['owner'], data['owner_id'], data['_id'])
+            shoppinglist.new_item(item_name=item_name, quantity=quantity)
 
     def save_to_users(self):
         Data.add_data(self.user_data())
@@ -75,16 +75,15 @@ class User(object):
 
 class ShoppingList(object):
 
-    def __init__(self, title, owner, intro, owner_id, _id=None):
+    def __init__(self, title, owner, owner_id, _id=None):
         self.title = title
-        self.intro = intro
         self.owner = owner
         self.owner_id = owner_id
         self._id = uuid.uuid4().hex if _id is None else _id
 
-    def new_item(self, item_name, description, date=datetime.datetime.utcnow()):
+    def new_item(self, item_name, quantity, date=datetime.datetime.utcnow()):
         item = Item(item_name=item_name,
-                    description=description,
+                    quantity=quantity,
                     owner_id=self._id,
                     date=date)
         item.save_to_items()
@@ -92,7 +91,6 @@ class ShoppingList(object):
     def shoppinglist_data(self):
         return {
             'title': self.title,
-            'intro': self.intro,
             '_id': self._id,
             'owner': self.owner,
             'owner_id': self.owner_id
@@ -103,9 +101,9 @@ class ShoppingList(object):
 
 
 class Item(object):
-    def __init__(self, item_name, description, owner_id, date, _id=None):
+    def __init__(self, item_name, quantity, owner_id, date, _id=None):
         self.item_name = item_name
-        self.description = description
+        self.quantity = quantity
         self.owner_id = owner_id
         self.date = date
         self._id = uuid.uuid4().hex if _id is None else _id
@@ -114,7 +112,7 @@ class Item(object):
         return {
             '_id': self._id,
             'item_name': self.item_name,
-            'description': self.description,
+            'quantity': self.quantity,
             'owner_id': self.owner_id,
             'date': self.date
         }

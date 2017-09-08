@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, flash, session, request
 from werkzeug.security import generate_password_hash
 from functools import wraps
-from app.forms import RegisterForm, LoginForm, TextForm
+from app.forms import RegisterForm, LoginForm, ShoppingitemForm, Shoppinglist_nameForm
 from app.models import Data, User
 from app import app
 
@@ -40,7 +40,7 @@ def sign_up():
             session['username'] = username
             session['id'] = user['_id']
 
-            flash('{}, You have successfully signed up '.format(username))
+            flash('{}, You have successfully signed up'.format(username))
             print(Data.users)
             return redirect(url_for('dashboard'))
         else:
@@ -54,7 +54,6 @@ def login():
     title = "Login"
     form = LoginForm()
     if form.validate_on_submit():
-        username = form.username.data
         email = form.email.data
         password = generate_password_hash(form.password.data)
         if User.check_user_exists(email):
@@ -62,8 +61,6 @@ def login():
                 session['logged_in'] = True
                 session['email'] = email
                 session['password'] = password
-                session['username'] = username
-
                 flash("You have been logged in successfully")
                 return redirect(url_for('dashboard'))
             else:
@@ -78,7 +75,7 @@ def login():
 @app.route('/logout')
 @login_required
 def logout():
-    session.pop('username', None)
+    session.pop('email', None)
     flash('You were logged out!')
     return redirect(url_for('login'))
 
@@ -87,15 +84,14 @@ def logout():
 @login_required
 def create_shoppinglist():
     title = "Create Shopping List"
-    form = TextForm()
+    form = Shoppinglist_nameForm()
     user = User(session['email'], session['password'], session['username'])
     if form.validate_on_submit():
         title = form.name.data
-        content = form.content.data
-        user.create_shoppinglist(title, content)
+        user.create_shoppinglist(title)
         flash(' You have successfully created a shopping list')
         return redirect(url_for('dashboard'))
-    return render_template('create_list.html',
+    return render_template('dashboard.html',
                            form=form,
                            title=title)
 
@@ -104,14 +100,14 @@ def create_shoppinglist():
 @login_required
 def create_item(_id):
     title = "Create Shopping List"
-    form = TextForm()
+    form = ShoppingitemForm()
     if form.validate_on_submit():
         item_name = form.name.data
-        description = form.content.data
-        User.create_item(_id, item_name, description)
+        quantity = form.quantity.data
+        User.create_item(_id, item_name, quantity)
         flash(' You have created a shopping list item')
         return redirect(url_for('shoppinglist_items', _id=_id))
-    return render_template('create_item.html',
+    return render_template('list_items.html',
                            form=form,
                            title=title)
 
@@ -119,7 +115,7 @@ def create_item(_id):
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    form = TextForm()
+    form = Shoppinglist_nameForm()
     title = "Dashboard"
     shopping_lists = Data.get_the_data(session['id'], Data.shoppinglists)
     notify = 'You have no shopping lists yet!'
@@ -135,6 +131,7 @@ def dashboard():
 @app.route('/list_items/')
 @login_required
 def shoppinglist_items(_id):
+    form = ShoppingitemForm()
     title = "Items"
     shopping_list = Data.get_the_data(_id, Data.shoppinglists)
     items = Data.get_the_data(_id, Data.items)
@@ -143,6 +140,7 @@ def shoppinglist_items(_id):
                            items=items,
                            notify=notify,
                            shopping_list=shopping_list,
+                           form=form,
                            title=title)
 
 
@@ -151,19 +149,16 @@ def shoppinglist_items(_id):
 def edit_shoppinglist(_id):
     page_title = "Edit"
     index_ = Data.get_index(_id, Data.shoppinglists)
-    form = TextForm(request.form)
+    form = Shoppinglist_nameForm(request.form)
 
     form.name.data = Data.shoppinglists[index_]['Name']
-    form.content.data = Data.shoppinglists[index_]['Content']
 
     if form.validate_on_submit():
-        title = request.form['title']
-        intro = request.form['body']
+        title = request.form['name']
         Data.shoppinglists[index_]['title'] = title
-        Data.shoppinglists[index_]['intro'] = intro
         flash('Your Shopping list has been updated')
         return redirect(url_for('dashboard'))
-    return render_template('create_list.html', form=form, title=page_title)
+    return render_template('dashboard.html', form=form, title=page_title)
 
 
 @app.route('/edit_shoppinglist_item/<string:_id>/', methods=['GET', 'POST'])
@@ -172,21 +167,21 @@ def edit_shoppinglist_item(_id):
 
     page_title = "Edit"
     index_ = Data.get_index(_id, Data.items)
-    form = TextForm()
+    form = ShoppingitemForm()
 
 #    ### populating the form for user to edit ###
 
     form.name.data = Data.items[index_]['item_name']
-    form.content.data = Data.items[index_]['description']
+    form.quantity.data = Data.items[index_]['quantity']
 
-    if request.method == 'POST' and form.validate():
+    if form.validate_on_submit():
         title = request.form['title']
-        intro = request.form['body']
+        quantity = request.form['body']
         Data.items[index_]['item_name'] = title
-        Data.items[index_]['description'] = intro
+        Data.items[index_]['quantity'] = quantity
         flash('Your Item has been updated', 'success')
         return redirect(url_for('shoppinglist_items', _id=Data.items[index_]['owner_id']))
-    return render_template('create_item.html', form=form, title=page_title)
+    return render_template('list_items.html', form=form, title=page_title)
 
 
 @app.route('/delete/<string:_id>/')
@@ -206,5 +201,5 @@ def delete_item(_id):
     index_ = Data.get_index(_id, Data.items)
     sh_id = Data.items[index_]['owner_id']
     Data.delete_dictionary(_id, Data.items)
-    flash('Item deleted', 'Danger')
+    flash('Item deleted')
     return redirect(url_for('shoppinglist_items', _id=sh_id))

@@ -1,10 +1,135 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "bootstrap/utils.html" as utils %}
 
-</body>
-</html>
+{% block title %}
+Shopping List App
+{% endblock %}
+
+{% block styles %}
+{{super()}}
+<link rel="stylesheet" href="{{url_for('.static', filename='shopping_list.css')}}">
+{% endblock %}
+
+{% block content %}
+{{super()}}
+<nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+    <div class="container topnav">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand topnav" href="index.html">Shopping List App</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="index.html">Home</a></li>
+                <li><a href={{url_for("logout")}}>Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="jumbotron">
+
+    <h2>{{ username }}</h2>
+
+    <button class="btn" data-toggle="modal" data-target="#myModal">Create item</button>
+
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Create a Shopping item</h4>
+                </div>
+                <div class="modal-body">
+                    <form role="form">
+                        <div class="form-group">
+                            {{ form.csrf_token }}
+                            {{ wtf.form_field(form.name) }}
+                            {{ wtf.form_field(form.quantity) }}
+                            {{ wtf.form_field(form.submit) }}
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger btn-default pull-left" data-dismiss="modal">
+                        <span class="glyphicon glyphicon-remove"></span> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    {% if shoppinglists %}
+    <div class="row">
+        <div class="dash-table col-md-8">
+            <h1>My Shopping Lists</h1>
+            <table class="table">
+                <tr>
+                    <th>Item Name</th>
+                </tr>
+                {% for item in items %}
+                <tr>
+                    <td><a href="#">{{ item['item_name'] }}</a></td>
+                    <td class="edit-buttons">
+                        <button class="btn" data-toggle="modal" data-target="#myModal2"><a href="/edit_shoppinglist_item/{{ item['_id'] }}">Edit</a></button>
+
+                        <div class="modal fade" id="myModal2" role="dialog">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4><span class="glyphicon glyphicon-lock"></span> Edit a Shopping item</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form role="form">
+                                            <div class="form-group">
+                                                {{ form.csrf_token }}
+                                                {{ wtf.form_field(form.name) }}
+                                                {{ wtf.form_field(form.quantity) }}
+                                                {{ wtf.form_field(form.submit) }}
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-danger btn-default pull-left" data-dismiss="modal">
+                                            <span class="glyphicon glyphicon-remove"></span> Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn"><a href="/delete_item/{{ item['_id'] }}">Delete</a></button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <h3> {{ notify }}</h3>
+
+    {% endif %}
+    {{ utils.flashed_messages() }}
+</div>
+
+<footer class="w3-container w3-padding-64 w3-center w3-black w3-xlarge">
+    <a href="#"><i class="fa fa-facebook-official"></i></a>
+
+    <a href="#"><i class="fa fa-twitter"></i></a>
+
+    <a href="#"><i class="fa fa-linkedin"></i></a>
+    <p class="w3-medium">
+        Powered by <a href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" target="_blank">bootstrap.css</a>
+    </p>
+</footer>
+{% endblock %}
