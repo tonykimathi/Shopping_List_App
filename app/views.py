@@ -39,6 +39,8 @@ def sign_up():
             session['logged_in'] = True
             session['username'] = username
             session['id'] = user['_id']
+            session['email'] = email
+            session['password'] = password
 
             flash('{}, You have successfully signed up'.format(username))
             print(Data.users)
@@ -110,7 +112,6 @@ def create_item(_id):
     return render_template('list_items.html',
                            form=form,
                            title=title)
-
 
 @app.route('/dashboard')
 @login_required
