@@ -1,168 +1,206 @@
 from flask import render_template, redirect, url_for, flash, session, request
+from werkzeug.security import generate_password_hash
 from functools import wraps
-from app.forms import RegisterForm, LoginForm, TextForm
-from app.models import User
-from app.models import ShoppingList
-from app.models import Item
-from app import app, data
-
-
-users = []
-shoppinglists = []
+from app.forms import RegisterForm, LoginForm, ShoppingitemForm, Shoppinglist_nameForm
+from app.models import Data, User
+from app import app
 
 
 def login_required(f):
     @wraps(f)
-    def verified(*args, **kwargs):
+    def wrap(*args, **kwargs):
 
-        if "username" in session:
+        if "logged_in" in session:
             return f(*args, **kwargs)
-
-        error = "You need to log in first"
-        return render_template("index.html", error=error)
-    return verified
+        else:
+            flash("You need to log in first")
+            return redirect(url_for('login'))
+    return wrap
 
 
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('index.html')
+    title = "Home"
+    return render_template('index.html', title=title)
 
 
 @app.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
-    error = None
+    title = "Sign Up"
     form = RegisterForm()
     if form.validate_on_submit():
-        data.create_user(form.username.data, form.email.data, form.password.data,
-                         form.first_name.data, form.last_name.data)
-        flash("Account successfully created")
-        return redirect(url_for('dashboard'))
-    return render_template('Sign Up.html', form=form, error=error)
+        username = form.username.data
+        email = form.email.data
+        password = generate_password_hash(form.password.data)
+
+        if User.sign_up_user(username, email, password) is True:
+            user = User.current_user(email)
+            session['logged_in'] = True
+            session['username'] = username
+            session['id'] = user['_id']
+            session['email'] = email
+            session['password'] = password
+
+            flash('{}, You have successfully signed up'.format(username))
+            print(Data.users)
+            return redirect(url_for('dashboard'))
+        else:
+            flash('You already have an account! Please log in')
+
+    return render_template('Sign Up.html', form=form, title=title)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    """ The user login method"""
-    error = None
+    title = "Login"
     form = LoginForm()
-
     if form.validate_on_submit():
-        for user in users:
-            if user.email == form.email.data:
-                if user.password == form.password.data:
-                    session['username'] = user.username
-                    flash("You have been logged in successfully")
-                    return redirect(url_for('dashboard'))
-            error = 'Invalid email/password'
-    return render_template('login.html',
-                           form=form,
-                           error=error
-                           )
-
-
-@app.route('/dashboard')
-@login_required
-def dashboard():
-    if session['logged_in']:
-        notify = 'You have no shopping lists yet'
-        return render_template(
-            "dashboard.html",
-            notify=notify
-        )
-
-
+        email = form.email.data
+        password = generate_password_hash(form.password.data)
+        if User.check_user_exists(email):
+            if User.verify_user_login_(email, password):
+                session['logged_in'] = True
+                session['email'] = email
+                session['password'] = password
+                flash("You have been logged in successfully")
+                return redirect(url_for('dashboard'))
+            else:
+                flash('Invalid password or email!')
+                return redirect(url_for('login'))
+        else:
+            flash('Email does not exist! Please Sign Up')
+            return redirect(url_for('sign_up'))
+    return render_template('login.html', form=form, title=title)
 
 
 @app.route('/logout')
 @login_required
 def logout():
-    session.pop('username', None)
+    session.pop('email', None)
     flash('You were logged out!')
     return redirect(url_for('login'))
 
 
-@app.route('/dashboard/create_shoppinglist', methods=['POST'])
+@app.route('/create_shoppinglist/', methods=['GET', 'POST'])
 @login_required
 def create_shoppinglist():
-    if session['username'] in shoppinglists:
-        data = request.form.to_dict()
-        shopping_list = data['shopping_list']
-        count_lists = (shoppinglists[session['username']])
-        new_shoppinglist = ShoppingList(shopping_list, count_lists)
-        shoppinglists[session['username']].append(new_shoppinglist)
+    title = "Create Shopping List"
+    form = Shoppinglist_nameForm()
+    user = User(session['email'], session['password'], session['username'])
+    if form.validate_on_submit():
+        title = form.name.data
+        user.create_shoppinglist(title)
+        flash(' You have successfully created a shopping list')
         return redirect(url_for('dashboard'))
+    return render_template('dashboard.html',
+                           form=form,
+                           title=title)
 
 
-@app.route('/shoppinglist/<shoppinglist_id>/create_item', methods=['GET', 'POST'])
+@app.route('/create_item/<string:_id>/', methods=['GET', 'POST'])
 @login_required
-def create_item(shoppinglist_id):
-    data = request.form.to_dict()
-    item = data['item']
-    shoppinglist = [
-        i for i in shoppinglists[session['username']] if str(i.Id) == shoppinglist_id
-    ]
-    shoppinglist = shoppinglist[0]
-    shoppinglist.add_item(item)
-    return redirect('/shoppinglist/' + shoppinglist_id)
+def create_item(_id):
+    title = "Create Shopping List"
+    form = ShoppingitemForm()
+    if form.validate_on_submit():
+        item_name = form.name.data
+        quantity = form.quantity.data
+        User.create_item(_id, item_name, quantity)
+        flash(' You have created a shopping list item')
+        return redirect(url_for('shoppinglist_items', _id=_id))
+    return render_template('list_items.html',
+                           form=form,
+                           title=title)
 
-
-@app.route('/bucket/<shoppinglist_id>', methods=['GET', 'POST'])
+@app.route('/dashboard')
 @login_required
-def view_shoppinglist(shoppinglist_id):
-    shoppinglist = [
-        i for i in shoppinglists[session['username']] if str(i.Id) == shoppinglist_id
-    ]
-    shoppinglist = shoppinglist[0]
-    return render_template('shoppinglist.html', shoppinglist=shoppinglist)
+def dashboard():
+    form = Shoppinglist_nameForm()
+    title = "Dashboard"
+    shopping_lists = Data.get_the_data(session['id'], Data.shoppinglists)
+    notify = 'You have no shopping lists yet!'
+    return render_template('dashboard.html',
+                           shopping_lists=shopping_lists,
+                           notify=notify,
+                           username=session['username'],
+                           form=form,
+                           title=title)
 
 
-@app.route('/shoppinglist/edit_shoppinglist/<shoppinglist_id>/', methods=['POST'])
+@app.route('/list_items/<string:_id>/')
+@app.route('/list_items/')
 @login_required
-def edit_shoppinglist(shoppinglist_id):
-    if request.method == 'POST':
+def shoppinglist_items(_id):
+    form = ShoppingitemForm()
+    title = "Items"
+    shopping_list = Data.get_the_data(_id, Data.shoppinglists)
+    items = Data.get_the_data(_id, Data.items)
+    notify = 'You have no items in this shopping list yet'
+    return render_template('list_items.html',
+                           items=items,
+                           notify=notify,
+                           shopping_list=shopping_list,
+                           form=form,
+                           title=title)
+
+
+@app.route('/edit_shoppinglist/<string:_id>/', methods=['GET', 'POST'])
+@login_required
+def edit_shoppinglist(_id):
+    page_title = "Edit"
+    index_ = Data.get_index(_id, Data.shoppinglists)
+    form = Shoppinglist_nameForm(request.form)
+
+    form.name.data = Data.shoppinglists[index_]['Name']
+
+    if form.validate_on_submit():
+        title = request.form['name']
+        Data.shoppinglists[index_]['title'] = title
+        flash('Your Shopping list has been updated')
+        return redirect(url_for('dashboard'))
+    return render_template('dashboard.html', form=form, title=page_title)
+
+
+@app.route('/edit_shoppinglist_item/<string:_id>/', methods=['GET', 'POST'])
+@login_required
+def edit_shoppinglist_item(_id):
+
+    page_title = "Edit"
+    index_ = Data.get_index(_id, Data.items)
+    form = ShoppingitemForm()
+
+#    ### populating the form for user to edit ###
+
+    form.name.data = Data.items[index_]['item_name']
+    form.quantity.data = Data.items[index_]['quantity']
+
+    if form.validate_on_submit():
         title = request.form['title']
-        shoppinglist = [
-            i for i in shoppinglists[session['username']] if str(i.Id) == shoppinglist_id
-        ]
-        shoppinglist = shoppinglist[0]
-        shoppinglist.update_name(title)
-        return redirect(url_for('dashboard'))
+        quantity = request.form['body']
+        Data.items[index_]['item_name'] = title
+        Data.items[index_]['quantity'] = quantity
+        flash('Your Item has been updated', 'success')
+        return redirect(url_for('shoppinglist_items', _id=Data.items[index_]['owner_id']))
+    return render_template('list_items.html', form=form, title=page_title)
 
 
-@app.route('/shoppinglist/<shoppinglist_id>/edit_item/<item_id>', methods=['GET', 'POST'])
-@login_required
-def edit_shoppinglist_item(shoppinglist_id, item_id):
-    if request.method == 'POST':
-        data = request.form.to_dict()
-        new_text = data['new_text']
-        shoppinglist = [
-            i for i in shoppinglists[session['username']] if str(i.Id) == shoppinglist_id
-        ]
-        shoppinglist = shoppinglist[0]
-        item = [i for i in shoppinglist.items if str(i['Id']) == item_id]
-        item = item[0]
-        item.update_item(item_id, new_text)
-        return redirect('/shoppinglist/' + shoppinglist_id)
-
-
-@app.route('/delete/<shoppinglist_id>/')
-@login_required
-def delete_shoppinglist(shoppinglist_id):
-    for i in shoppinglists[session['username']]:
-        if str(i.Id) == shoppinglist_id:
-            shoppinglists[session['username']].remove(i)
+@app.route('/delete/<string:_id>/')
+def delete_shoppinglist(_id):
+    Data.delete_dictionary(_id, Data.shoppinglists)
+    all_items = Data.get_the_data(_id, Data.items)
+    if all_items is not None:
+        for item in all_items:
+            if item['_id'] in Data.items:
+                Data.delete_dictionary(item['_id'], Data.items)
+    flash('Shopping list deleted')
     return redirect(url_for('dashboard'))
 
 
-@app.route('/delete_item/<item_id>/')
-@login_required
-def delete_item(item_id):
-    if request.method == 'POST':
-        itemlist = [
-            i for i in shoppinglists[session['username']] if str(i.Id) == item_id
-        ]
-        itemlist = itemlist[0]
-        item = [i for i in itemlist.items if str(i['Id']) == item_id]
-        item.remove_item(item_id)
-        return redirect('/shoppinglist/' + item_id)
+@app.route('/delete_item/<string:_id>/')
+def delete_item(_id):
+    index_ = Data.get_index(_id, Data.items)
+    sh_id = Data.items[index_]['owner_id']
+    Data.delete_dictionary(_id, Data.items)
+    flash('Item deleted')
+    return redirect(url_for('shoppinglist_items', _id=sh_id))

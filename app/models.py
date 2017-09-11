@@ -1,191 +1,152 @@
-
 import uuid
+from werkzeug.security import check_password_hash
+import datetime
 
 
 class User(object):
-    count = 0
 
-    def __init__(self, username, email, first_name, last_name, password, user_id=None):
+    def __init__(self, username, email, password, _id=None):
         self.username = username
         self.email = email
-        self.first_name = first_name
-        self.last_name = last_name
         self.password = password
-        self.shopping_lists = []
-        self.user_id = uuid.uuid4().hex if user_id is None else user_id
-
-        self.info = {
-            'username': self.username,
-            'first_name': self.first_name,
-            'last_name': self.last_name,
-            'email': self.email,
-            'password': self.password,
-            'user_id': self.user_id,
-            'shopping_lists': self.shopping_lists
-        }
-
-        User.count += 1
-
-    def view_info(self):
-        return self.info
-
-    def return_user_name(self):
-        return self.username
+        self._id = uuid.uuid4().hex if _id is None else _id
 
     @staticmethod
-    def count_users():
-        return User.count
+    def check_user_exists(email):
+        data = [user['email'] for user in Data.users if email == user['email']]
+        email_entered = "".join(data)
+        if email_entered == email:
+            return True
+        return False
+
+    @staticmethod
+    def verify_user_login_(email, password):
+
+        user_exists = User.check_user_exists(email)
+        if user_exists is True:
+            emails_password = "".join([user['password'] for user in Data.users if email == user['email']])
+            return check_password_hash(emails_password, password)
+        return False
+
+    @staticmethod
+    def get_username(email):
+        username = [user['username'] for user in Data.users if email == user['email']]
+        user_name = "".join(username)
+        return user_name
+
+    @classmethod
+    def sign_up_user(cls, username, email, password):
+        user = cls.check_user_exists(email)
+        if user is False:
+            registered_user = cls(username, email, password)
+            registered_user.save_to_users()
+            return True
+        return False
+
+    def user_data(self):
+        return {
+            'username': self.username,
+            'email': self.email,
+            'password': self.password,
+            '_id': self._id
+        }
+
+    def create_shoppinglist(self, title):
+        shopping_list = ShoppingList(owner_id=self._id, title=title, owner=self.username)
+        shopping_list.save_to_shoppinglists()
+
+    @staticmethod
+    def create_item(_id, item_name, quantity):
+
+        shoppinglist_data = Data.get_the_data(_id, Data.shoppinglists)
+        for data in shoppinglist_data:
+            shoppinglist = ShoppingList(data['title'], data['owner'], data['owner_id'], data['_id'])
+            shoppinglist.new_item(item_name=item_name, quantity=quantity)
+
+    def save_to_users(self):
+        Data.add_data(self.user_data())
+
+    @staticmethod
+    def current_user(email):
+        for user in Data.users:
+            if email == user['email']:
+                return user
 
 
 class ShoppingList(object):
-    count = 0
 
-    def __init__(self, list_name, owner, shopping_list_id=None):
-        self.list_name = list_name
+    def __init__(self, title, owner, owner_id, _id=None):
+        self.title = title
         self.owner = owner
-        self.shopping_list_id = uuid.uuid4().hex if shopping_list_id is None else shopping_list_id
+        self.owner_id = owner_id
+        self._id = uuid.uuid4().hex if _id is None else _id
 
-        self.info = {
-            'list_name': self.list_name,
+    def new_item(self, item_name, quantity, date=datetime.datetime.utcnow()):
+        item = Item(item_name=item_name,
+                    quantity=quantity,
+                    owner_id=self._id,
+                    date=date)
+        item.save_to_items()
+
+    def shoppinglist_data(self):
+        return {
+            'title': self.title,
+            '_id': self._id,
             'owner': self.owner,
-            'shopping_list_id': self.shopping_list_id,
+            'owner_id': self.owner_id
         }
 
-        ShoppingList.count += 1
-
-    def return_owner_name(self):
-        return self.owner
-
-    def update_name(self, new_title):
-        self.list_name = new_title
-        return new_title
+    def save_to_shoppinglists(self):
+        Data.add_data(self.shoppinglist_data())
 
 
 class Item(object):
-    count = 0
-
-    def __init__(self, item_name, owner, item_id=None):
+    def __init__(self, item_name, quantity, owner_id, date, _id=None):
         self.item_name = item_name
-        self.owner = owner
-        self.item_id = uuid.uuid4().hex if item_id is None else item_id
+        self.quantity = quantity
+        self.owner_id = owner_id
+        self.date = date
+        self._id = uuid.uuid4().hex if _id is None else _id
 
-        self.info = {
+    def item_data(self):
+        return {
+            '_id': self._id,
             'item_name': self.item_name,
-            'owner': self.owner,
-            'item_id': self.item_id,
+            'quantity': self.quantity,
+            'owner_id': self.owner_id,
+            'date': self.date
         }
-        Item.count += 1
+
+    def save_to_items(self):
+        Data.add_data(self.item_data())
 
 
+class Data(object):
+    users = []
+    shoppinglists = []
+    items = []
 
-#    def add_item(self, item):
-#        self.item_content.append({"Id": self.count, "body": item})
-#        self.count += 1
+    @staticmethod
+    def add_data(arg):
+        if 'email' in arg:
+            Data.users.append(arg)
+        elif 'title' in arg:
+            Data.shoppinglists.append(arg)
+        elif 'item_name' in arg:
+            Data.items.append(arg)
 
-#    def update_item(self, item_id, item):
-#        for i in self.item_content:
-#            if str(i['Id']) == item_id:
- #               i['body'] = item
+    @staticmethod
+    def get_the_data(_id, arg):
+        data_retrieved = [data for data in arg if _id == data['_id'] or _id == data['owner_id']]
+        return data_retrieved
 
-#    def remove_item(self, item_id):
-#        for i in self.item_content:
-#            if str(i['Id']) == item_id:
- #               self.item_content.remove(i)
+    @staticmethod
+    def get_index(_id, arg):
+        dict_index = [index for index in arg if _id == index['_id']]
+        dict_index = arg.index(dict_index[0])
+        return dict_index
 
-
-class Data ():
-    users = [{'username': None, 'first_name': None, 'last_name': None, 'email': None,
-              'password': None, 'user_id': None, 'shopping_lists': None}]
-
-    def create_user(self, username, email, first_name, last_name, password):
-        created_user = User(username, email, first_name, last_name, password)
-        created_user_info = created_user.view_info()
-        for user in self.users:
-            if created_user_info['email'] == user['email']:
-                return 'You already have an account'
-            elif created_user_info['username'] == user['username']:
-                return 'Username already in use'
-            else:
-                self.users.append(created_user_info)
-            return 'Account successfully created'
-
-    def get_user(self, user_id):
-        for user in self.users:
-            if user['user_id'] == user_id:
-                return user
-
-    def create_shoppinglist(self):
-
-        create_shopping_list = ShoppingList()
-
-
-    def add_shoppinglist(self, user_id, name):
-        """
-            Method to add shoppinglists to a user given the id of the
-            user
-        """
-        new_shoppinglist = ShoppingList(name)
-        new_shoppinglist_details = new_shoppinglist.get_details()
-        user = self.get_single_user(user_id)
-        new_shoppinglist_details['id'] = len(user['shopping_lists']) + 1
-        for item in user['shopping_lists']:
-            if item['name'] == name:
-                return "Shopping list " + str(name) + " exits. Try editing it"
-            if new_shoppinglist_details['id'] == item['id']:
-                new_shoppinglist_details['id'] = new_shoppinglist_details['id']
-                + 1
-        user['shopping_lists'].append(new_shoppinglist_details)
-        return "Shopping list " + str(name) + " Created"
-
-    def get_shoppinglist(self, user_id, item_id):
-        """
-            Method to return a single user item based on the user
-            item's id and its user's id
-        """
-        single_user = self.get_single_user(user_id)
-        for item in single_user['shopping_lists']:
-            if item['id'] == item_id:
-                return item
-
-    def remove_shoppinglist(self, user_id, item_id):
-        """
-            Method to delete a user item based on its id and its
-            user's id
-        """
-        single_user = self.get_single_user(user_id)
-        for item in single_user['shopping_lists']:
-            if item['id'] == int(item_id):
-                single_user['shopping_lists'].remove(item)
-
-    def add_shoppingitems(self, user_id, shoppinglist_id, name, quantity):
-        """
-            Method to add shopping items to a shopping list
-        """
-        new_shoppingitem = ShoppingItem(name, quantity)
-        new_shoppingitem_details = new_shoppingitem.get_details()
-        user = self.get_single_user(user_id)
-        for shopinglist in user['shopping_lists']:
-            if shopinglist['id'] == int(shoppinglist_id):
-                curr_shopinglist = shopinglist
-                new_shoppingitem_details['id'] = len(curr_shopinglist['items']) + 1
-                for item in curr_shopinglist['items']:
-                    if item['name'] == name:
-                        return "Item " + str(name) + " exits. Try editing it"
-                    if new_shoppingitem_details['id'] == item['id']:
-                        new_shoppingitem_details['id'] = new_shoppingitem_details['id'] + 1
-                curr_shopinglist['items'].append(new_shoppingitem_details)
-                return str(name) + " has been added"
-
-    def get_shoppingitem(self, user_id, shoppinglist_id, item_id):
-        """Method to get a single item from the shopping list"""
-        shoppinglist = self.get_shoppinglist(user_id, shoppinglist_id)
-        for item in shoppinglist['items']:
-            if item['id'] == item_id:
-                return item
-
-    def remove_shoppingitem(self, user_id, shoppinglist_id, item_id):
-        """Method to delete an item from the shoppinglist"""
-        shoppinglist = self.get_shoppinglist(user_id, shoppinglist_id)
-        for item in shoppinglist['items']:
-            if item['id'] == int(item_id):
-                shoppinglist['items'].remove(item)
+    @staticmethod
+    def delete_dictionary(_id, arg):
+        dict_index = Data.get_index(_id, arg)
+        del arg[dict_index]

@@ -6,8 +6,6 @@ from app.models import Data
 app = Flask(__name__)
 Bootstrap(app)
 
-data = Data()
-
 from app import views
 
 app.config.from_object('config')

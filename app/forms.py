@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms.validators import InputRequired, Email, Length
-from wtforms import StringField, PasswordField, BooleanField, TextAreaField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField
 
 
 class LoginForm(FlaskForm):
@@ -12,16 +12,21 @@ class LoginForm(FlaskForm):
 class RegisterForm(FlaskForm):
     username = StringField('username', validators=[InputRequired(), Length(min=4, max=15)])
     email = StringField('email', validators=[InputRequired(), Email(message='Invalid email'), Length(max=50)])
-    first_name = StringField('first_name', validators=[InputRequired(), Length(min=4, max=15)])
-    last_name = StringField('last_name', validators=[InputRequired(), Length(min=4, max=15)])
     password = PasswordField('password', validators=[InputRequired(), Length(min=8, max=80)])
     confirm = PasswordField('Confirm Password')
     remember = BooleanField('Remember me')
 
 
-class TextForm(FlaskForm):
-    title = StringField('Title', validators=[Length(min=5)])
-    body = TextAreaField('Body', validators=[Length(min=5)])
+class Shoppinglist_nameForm(FlaskForm):
+    name = StringField('Name', validators=[InputRequired(), Length(min=5)])
+    submit = SubmitField('Add')
+
+
+class ShoppingitemForm(FlaskForm):
+    """For used to create a shopping list item"""
+    name = StringField('Name', validators=[InputRequired(), Length(min=5)])
+    quantity = StringField('quantity', validators=[InputRequired()])
+    submit = SubmitField('Add')
 
 
 
