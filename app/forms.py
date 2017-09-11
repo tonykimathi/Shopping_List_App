@@ -19,14 +19,12 @@ class RegisterForm(FlaskForm):
 
 class Shoppinglist_nameForm(FlaskForm):
     name = StringField('Name', validators=[InputRequired(), Length(min=5)])
-    submit = SubmitField('Add')
 
 
 class ShoppingitemForm(FlaskForm):
     """For used to create a shopping list item"""
     name = StringField('Name', validators=[InputRequired(), Length(min=5)])
     quantity = StringField('quantity', validators=[InputRequired()])
-    submit = SubmitField('Add')
 
 
 
